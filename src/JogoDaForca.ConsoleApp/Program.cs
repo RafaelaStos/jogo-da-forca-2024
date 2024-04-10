@@ -4,53 +4,74 @@
     {
         static void Main(string[] args)
         {
-            int cont = 5;
-            string aleatorio;
-            char[] palavraSecreta, palavra;
-            ObterPalavraAleatoria(out aleatorio, out palavraSecreta, out palavra);
-
-            while (cont >= 0)
+            while (true)
             {
-                MostarForca(cont);
-                Console.WriteLine($"\nVocê tem {cont} tentativas.\n");
-                ImprimirPalavra(aleatorio, palavraSecreta);
 
-                Console.WriteLine();
-                char chute = ObterChute();
-                bool erro = AvaliarChute(aleatorio, palavraSecreta, palavra, ref cont, chute);
-                Console.WriteLine();
+                int contErros = 0;
+                string aleatorio;
+                char[] palavraSecreta, palavra;
+                bool letraEncontrada = false;
+                bool jogadorEnforcou = false;
+                bool jogadorAcertou = false;
 
+                ObterPalavraAleatoria(out aleatorio, out palavraSecreta, out palavra);
 
-                for (int i = 0; i < aleatorio.Length; i++)
-                {
-                    if (chute == palavra[i])
+               do{
+                    MostarForca(contErros);
+                    ImprimirPalavra(aleatorio, palavraSecreta);
+
+                    Console.WriteLine();
+                    char chute = ObterChute();
+
+                    Console.WriteLine();
+
+                    MostarForca(contErros);
+
+                    for (int i = 0; i < aleatorio.Length; i++)
                     {
-                        palavraSecreta[i] = chute;
+                        if (chute == palavra[i])
+                        {
+                            palavraSecreta[i] = chute;
+                            letraEncontrada = true;
+                        }
 
                     }
 
-                }
-                bool igais = PalavraDesvendada(palavraSecreta, palavra);
-                if (igais)
-                {
-                    Console.WriteLine($"Parabéns você Acertou!");
-                    Console.Write($"A Palavra é {aleatorio}");
+                    if (letraEncontrada == false)
+                        contErros++;
+
+                    jogadorEnforcou = contErros >= 5;
+                    jogadorAcertou = palavra.SequenceEqual(palavraSecreta);
+
+                    if (jogadorAcertou)
+                        Console.WriteLine($"Parabéns você Acertou! A Palavra é {aleatorio}");
+
+                    else if (jogadorEnforcou)
+                        Console.WriteLine($"que pena você perdeu! A Palavra era {aleatorio}");
+
+
+
+
+                } while (jogadorEnforcou == false && jogadorAcertou == false) ;
+                if (Continuar())
                     break;
-                }
-
-
             }
-
-
-            Console.ReadLine();
+            Console.Clear();
+            
 
         }
-
+        static bool Continuar()
+        {
+            Console.WriteLine();
+            Console.WriteLine("Deseja repetir? [S,N]");
+            string continuar = Console.ReadLine();
+            return continuar == "N" || continuar == "S";
+        }
         private static void ObterPalavraAleatoria(out string aleatorio, out char[] palavraSecreta, out char[] palavra)
         {
             Random num = new Random();
             int numLista = num.Next(0, 29);
-            string[] listaPalavra = { "ABACATE", "ABACAXI", "ABACATE", "ACEROLA",
+            string[] listaPalavra = { "ABACATE", "ABACAXI",  "ACEROLA",
                 "AÇAÍ", "ARAÇA", "BACABA", "BACURI", "BANANA", "CAJÁ", "CAJÚ",
                 "CARAMBOLA", "CUPUAÇU", "GRAVIOLA", "GOIABA", "JABUTICABA",
                 "JENIPAPO", "MAÇÃ", "MANGABA", "MANGA", "MARACUJÁ", "MURICI",
@@ -60,15 +81,6 @@
             palavra = aleatorio.ToCharArray();
         }
 
-        private static bool PalavraDesvendada(char[] palavraSecreta, char[] palavra)
-        {
-            if (palavra.SequenceEqual(palavraSecreta))
-            {
-                
-                return true;
-            }
-            return false;   
-        }
 
         private static void ImprimirPalavra(string aleatorio, char[] palavraSecreta)
         {
@@ -84,102 +96,35 @@
             Console.WriteLine();
         }
 
-        static void MostarForca(int cont)
+        static void MostarForca(int contErros)
         {
             Console.Clear();
 
-            if (cont == 4)
-                Console.Write("---------- \n " +
-                "|/   \t | \n " +
-                "| \t O\n " +
-                "| \n " +
-                "| \n " +
-                "| \n " +
-                "| \n " +
-                "|\n" +
-                "_|____");
+            string cabecaDoBoneco = contErros >= 1 ? " o " : " ";
+            string tronco = contErros >= 2 ? "x" : " ";
+            string troncoBaixo = contErros >= 2 ? " x " : " ";
+            string bracoEsquerdo = contErros >= 3 ? "/" : " ";
+            string bracoDireito = contErros >= 3 ? @"\" : " ";
+            string pernas = contErros >= 4 ? "/ \\" : " ";
 
-            else if (cont == 3)
-                Console.Write("---------- \n " +
-               "|/   \t | \n " +
-               "| \t O\n " +
-               "| \t/ \n " +
-               "| \n " +
-               "| \n " +
-               "| \n " +
-               "|\n" +
-               "_|____");
-
-            else if (cont == 2)
-                Console.Write("---------- \n " +
-                "|/   \t | \n " +
-                "| \t O\n " +
-                "| \t/X\n " +
-                "| \n " +
-                "| \n " +
-                "| \n " +
-                "|\n" +
-                "_|____");
-
-            else if (cont == 1)
-                Console.Write("---------- \n " +
-               "|/   \t | \n " +
-               "| \t O\n " +
-               "| \t/X)\n " +
-               "| \n " +
-               "| \n " +
-               "| \n " +
-               "|\n" +
-               "_|____");
-
-            else if (cont == 0)
-                Console.Write("---------- \n " +
-                "|/   \t | \n " +
-                "| \t O\n " +
-                "| \t/X)\n " +
-                "| \t X \n " +
-                "| \n " +
-                "| \n " +
-                "|\n" +
-                "_|____");
-
-            else if (cont == 5 )
-                Console.Write("---------- \n " +
-                          "|/   \t | \n " +
-                          "| \n " +
-                          "| \n " +
-                          "| \n " +
-                          "| \n " +
-                          "| \n " +
-                          "|\n" +
-                          "_|____\n");
+            Console.Clear();
+            Console.WriteLine(" ___________        ");
+            Console.WriteLine(" |/        |        ");
+            Console.WriteLine(" |        {0}       ", cabecaDoBoneco);
+            Console.WriteLine(" |        {0}{1}{2} ", bracoEsquerdo, tronco, bracoDireito);
+            Console.WriteLine(" |        {0}       ", troncoBaixo);
+            Console.WriteLine(" |        {0}       ", pernas);
+            Console.WriteLine(" |                  ");
+            Console.WriteLine(" |                  ");
+            Console.WriteLine("_|____              ");
 
             Console.WriteLine();
         }
 
-        static bool AvaliarChute(string aleatorio, char[] palavraSecreta, char[] palavra, ref int cont, char chute)
-        {
-            for (int i = 0; i < aleatorio.Length; i++)
-            {
-
-                if (chute == palavra[i])
-                {
-                    return true;
-
-                }
-
-
-
-            }
-            cont--;
-            return false;
-        }
-
-
         static char ObterChute()
         {
             Console.Write("Qual é seu chute? ");
-            char chute = Convert.ToChar(Console.ReadLine());
+            char chute = Convert.ToChar(Console.ReadLine().ToUpper());
             return chute;
         }
 
